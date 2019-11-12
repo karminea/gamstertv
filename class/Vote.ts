@@ -35,7 +35,7 @@ export class Vote{
         else
         {
             this.voteUser.push(user);
-            const count:number = this.voteCount.getValue(index);
+            const count:number = this.voteCount.getValue(index)||0;
             this.voteCount.setValue(index,count + 1);
         }        
     }

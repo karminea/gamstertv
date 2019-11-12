@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon --exec ts-node index.ts --delay 2"
+    "start": "nodemon --exec ts-node index.ts --delay 2",
+    "start-node" :"nodemon --exec node index --delay 2",
+    "build":"tsc --build tsconfig.json"
   },
   "author": "",
   "license": "ISC",

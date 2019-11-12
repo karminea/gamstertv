@@ -1,13 +1,16 @@
 import * as Collections from 'typescript-collections'
 import {Client, ChatUserstate} from 'tmi.js'
-import {DBClient} from "./DBClient"
+import DBClient from "./DBClient"
 import * as Type from "../interfaces/types";
 import * as Query from "../interfaces/querys";
+import {CLIENT_KEY,TOKEN} from "../interfaces/static";
 import * as fetch from "node-fetch";
 import TwitchClient from 'twitch';
 import {Vote} from './Vote';
 import {ExtCommands} from './ExtCommand';
 import {Taboos} from './Taboos';
+import { isNullOrUndefined } from 'util';
+
 
 const Fetch = fetch.default;
 
@@ -27,7 +30,7 @@ const krakenQueryData = await twitchApi.sendApiRequest("users?login=nightbot,moo
 export class Commands
 {
     public static db:DBClient = new DBClient();
-    public static twitchClient = (async () => await TwitchClient.withCredentials("myl9onshb8bl8ho6qdn2o64bg5w7y9", "qaoefyrcyrpfx54ux7dnj74avah2cw"))();
+    public static twitchClient = (async () => await TwitchClient.withCredentials(CLIENT_KEY, TOKEN))();
     public static VoteList:Collections.LinkedDictionary<string,Vote> = new Collections.LinkedDictionary<string,Vote>();
     
             
@@ -150,7 +153,7 @@ export class Commands
         const stream = await this.twitchClient.then(tx => tx.helix.streams.getStreamByUserName(channel))
         if (stream != null)
         {
-            const game:string = await stream.getGame().then(x => x.name);
+            const game:string = await stream.getGame().then(x => x?x.name:"");
             const title:string = stream.title;
             const viewers:number = stream.viewers;
             const uptime = Math.ceil((Date.now() - new Date(stream.startDate).getTime()) / 1000.0);
@@ -255,8 +258,7 @@ export class Commands
                 let vote = new Vote(client,channel,voteWords);
                 this.VoteList.setValue(channel, vote);        
                 vote.endVote().then(()=>{                
-                    this.VoteList.remove(channel);
-                    vote = null;
+                    this.VoteList.remove(channel);                    
                     console.log(`${channel} 채널에서 투표객체 삭제`)
                 });
             }

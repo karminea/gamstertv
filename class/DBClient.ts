@@ -1,8 +1,7 @@
 import { ConnectionPool, IRecordSet, ISqlTypeFactory, ISqlType } from "mssql/msnodesqlv8";
 import * as Type from "../interfaces/types";
-import { Vote } from "./Vote";
 
-export class DBClient {        
+export default class DBClient {        
     private pool:ConnectionPool;
     
     public isConn = ():boolean =>{
@@ -22,8 +21,7 @@ export class DBClient {
         }
 
         this.pool = new ConnectionPool(config);
-        this.pool.setMaxListeners(10);
-    }
+        this.pool.setMaxListeners(10);    }
    
     public async GetQuery<T>(query:string, ...param:Type.DBQueryKeyValue[]):Promise<IRecordSet<T>|void>
     {   
@@ -58,5 +56,4 @@ export class DBClient {
     }
 }
 
-export default DBClient;
 module.exports.DBClient = DBClient;

@@ -24,3 +24,16 @@ export interface SELECT_TABOO {
     TimeOut:number;    
     Reg_Date:Date;
 }
+
+export interface JWT {
+    exp:string;
+    user_id:string;
+    opaque_user_id:string;
+    channel_id:string;
+    role:"broadcaster" | "global";
+    is_unlinked:boolean;
+    pubsub_perms:{
+        listen:string[];
+        send:string[];
+    }
+}

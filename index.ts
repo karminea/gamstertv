@@ -1,7 +1,5 @@
 import {Client, Options} from "tmi.js";
-import {TwitchAPICallOptions, TwitchAPICallType} from 'twitch';
 import {Commands} from "./class/Commands";
-import { userInfo } from "os";
 import {Taboos} from './class/Taboos';
 
 let IsConnected:boolean = false;
@@ -31,46 +29,46 @@ client.on("ping",() => {
     console.log(`Received PING : ${new Date(Date.now()).toLocaleString()}`);
 });
 
-client.on("connecting",(address,port)=>{
-    Commands.botStatus(true).then(x=>{console.log("tmi connecting...")});
-})
+client.on("connecting", (address, port) => {
+    Commands.botStatus(true).then(x => { console.log("tmi connecting...") });
+});
 
-client.on("connected",(address,port)=>{
+client.on("connected", (address, port) => {
     IsConnected = true;
     console.log("tmi connected!");
-    Commands.twitchClient.then(tc => {    
+    Commands.twitchClient.then(tc => {
         tc.kraken.users.getMe().then(t => {
             return t.getFollows();
         }).then(c => {
             c.forEach(v => {
-                Taboos.initTaboo(v.channel.name).then(()=>{
-                    client.join(v.channel.name).then(x=>console.log(`${x[0]} 채널에 입장하였습니다.`));
+                Taboos.initTaboo(v.channel.name).then(() => {
+                    client.join(v.channel.name).then(x => console.log(`${x[0]} 채널에 입장하였습니다.`));
                 });
             })
         }).catch(err => {
             console.error("겜스터봇 팔로우정보 미획득");
-        })    
+        })
     }).catch(err => {
         console.error("트위치API 클라이언트 생성 실패");
     });
-})
+});
 
-client.on("disconnected",reason =>{
+client.on("disconnected", reason => {
     IsConnected = false;
-    Commands.botStatus(true).then(x=>{console.log(`tmi disconnected : ${reason}`)});    
-})
+    Commands.botStatus(true).then(x => { console.log(`tmi disconnected : ${reason}`) });
+});
 
-client.on("reconnect",()=>{
+client.on("reconnect", () => {
     console.log("tmi reconnect");
-    channels.forEach((value,index)=>{
-        client.join(value).then(x=>console.log(`${x[0]} 채널에 재입장하였습니다.`));
+    channels.forEach((value, index) => {
+        client.join(value).then(x => console.log(`${x[0]} 채널에 재입장하였습니다.`));
     });
-})
+});
 
 client.on("chat", (channel,userstate,message,self) => {
     if (self) return;
-    if (client.readyState() == "OPEN")
-    {        
+    if (client.readyState() === "OPEN")
+    {
         channel = channel.substring(1);
 
         if (message.startsWith("!"))
@@ -81,17 +79,17 @@ client.on("chat", (channel,userstate,message,self) => {
         let vote = Commands.VoteList.getValue(channel);
 
         if(vote)
-        {            
-            if (!isNaN(parseInt(message.substr(0,1))))
+        {
+            if (!isNaN(parseInt(message.substr(0,1))) && userstate.username)
             {
                 let voteNumber = parseInt(message.substr(0,1));
-                vote.setVoteCount(voteNumber,userstate.username);                
+                vote.setVoteCount(voteNumber,userstate.username);
             }
         }
 
         let taboo = Taboos.List(channel);
         taboo.forEach(v=>{
-            if(message.indexOf(v) > -1 && !userstate.mod && userstate.username != channel)
+            if(message.indexOf(v) > -1 && !userstate.mod && userstate.username !== channel && userstate.username)
             {
                 client.say(channel,`${userstate.username}님이 금지어를 사용하셨습니다.`);
                 client.timeout(channel,userstate.username,60,"금지어 사용").catch(err =>{

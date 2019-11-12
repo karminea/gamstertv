@@ -1,6 +1,6 @@
 import {Client, ChatUserstate} from 'tmi.js';
 import * as Collections from 'typescript-collections'
-import {DBClient} from "./DBClient";
+import DBClient from "./DBClient";
 import * as Type from "../interfaces/types";
 import * as Query from "../interfaces/querys";
 
